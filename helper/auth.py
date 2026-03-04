@@ -24,7 +24,7 @@ def _get_user(email):
     params = (email,)
     result = db.query(query, params)
 
-    return result[0] if result else None
+    return dict(result[0]) if result else None
 
 def _create_user(email, hashed_password):
     """
@@ -45,7 +45,7 @@ def authenticate_user(email, password):
         return "No such user found"
     else:
         if _verify_password(password, db_user['password_hash']):
-            return db_user
+            return dict(db_user)
         else:            
             return "Invalid password"
         

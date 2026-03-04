@@ -1,5 +1,5 @@
 CREATE TABLE users (
-    user_id INT PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER PRIMARY KEY AUTOINCREMENT, 
     email VARCHAR(256) UNIQUE,
     password_hash VARCHAR(512),
     global_persona TEXT,
@@ -8,7 +8,8 @@ CREATE TABLE users (
 
 CREATE TABLE conversations (
     conversation_id VARCHAR(256) PRIMARY KEY,
-    user_id INT,
+    user_id INTEGER,
+    title TEXT,
     metadata JSON,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

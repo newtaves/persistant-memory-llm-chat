@@ -11,6 +11,7 @@ with tab1:
         password = st.text_input("Password", type="password")
         if st.form_submit_button("Login"):
             result = authenticate_user(email, password)
+
             if isinstance(result, str):
                 st.error(result)
             else:

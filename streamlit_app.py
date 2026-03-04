@@ -10,11 +10,12 @@ if 'user' not in st.session_state:
 #Pages
 login_page = st.Page("pages/auth.py", title="Log In", icon=":material/login:")
 dashboard_page = st.Page("pages/dashboard.py", title="Dashboard", icon=":material/dashboard:")
+chat_page = st.Page("pages/chat.py", title="Chat", icon="🤖")
 
 
 if st.session_state['user'] is None:
     pg = st.navigation([login_page])
 else:
-    pg = st.navigation([dashboard_page])
+    pg = st.navigation([dashboard_page, chat_page])
 
 pg.run()
