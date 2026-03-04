@@ -28,7 +28,7 @@ CREATE TABLE messages (
 
 CREATE VIRTUAL TABLE message_embeddings USING vec0(
     message_id_ref INTEGER PRIMARY KEY, 
-    embedding FLOAT[384]
+    embedding FLOAT[768]
 );
 
 CREATE TRIGGER update_conv_timestamp AFTER INSERT ON messages
