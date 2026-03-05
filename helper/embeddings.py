@@ -1,6 +1,10 @@
 #Contains helper functions to create and manage embeddings for the documents and chat sessions.
 #
 #
+from db import db
+from sentence_transformers import SentenceTransformer
+
+model = SentenceTransformer("all-mpnet-base-v2")
 
 def get_context(query, top_k):
     """
@@ -18,5 +22,10 @@ def get_context(query, top_k):
         "France's capital is Paris.", "The city of Paris is the capital of France.", 
         "Paris, the capital of France, is known for its art and culture."]
     """
-    return 1
+
+    query_embeddings = model.encode(query)
+    query = "SELECT messages.content FROM message_embeddings JOIN messages ON messages.message_id = message_embeddings.message_id_ref  ORDER BY embedding <-> ? LIMIT ?;"
+    params = (query_embeddings, top_k,)
+
+    return db.execute(query,params)
 
