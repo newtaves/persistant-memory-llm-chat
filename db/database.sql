@@ -17,7 +17,7 @@ CREATE TABLE conversations (
 );
 
 CREATE TABLE messages (
-    message_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    message_id VARCHAR(256) PRIMARY KEY,
     conversation_id VARCHAR(256),
     role VARCHAR(50),
     content TEXT,
