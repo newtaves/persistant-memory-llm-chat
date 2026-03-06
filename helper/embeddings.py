@@ -3,29 +3,43 @@
 #
 from db import db
 from sentence_transformers import SentenceTransformer
+import re
 
-model = SentenceTransformer("all-mpnet-base-v2")
+_model = None
 
-def get_context(query, top_k):
+def get_model():
+    global _model
+    if _model is None:
+        _model = SentenceTransformer("paraphrase-MiniLM-L6-v2")
+    return _model
+
+
+def get_embeddings(texts):
+    model = get_model()
+    return model.encode(texts)
+
+def get_context(query):
     """
-    Search `query` in the vector database and return the top `top_k` most relevant documents as context for the chat session.
-    args:
-        query: The query to search in the vector database.
-        top_k: The number of most relevant documents to return as context.
-    returns:
-        A list of the top `top_k` most relevant documents as context for the chat session.
+    `query` breaks down the long message into shorter for the context search
 
     example:
-        context = get_context("What is the capital of France?", 5)
-        print(context)
-        >>> ["The capital of France is Paris.", "Paris is the capital city of France.", 
-        "France's capital is Paris.", "The city of Paris is the capital of France.", 
-        "Paris, the capital of France, is known for its art and culture."]
+        message = "The sun set slowly over the mountains, casting long shadows across the valley.
+        A cool breeze rustled the leaves, signaling the end of a hot summer day. 
+        Birds began their evening songs, while lights twinkled on in the distant town. 
+        It was a moment of peaceful calm"
+        message_list = list(map(lambda x :x.strip(), re.split(r'[,;|.]',message)))
+        print(*message_list, sep="\n")
+        >>> The sun set slowly over the mountains
+        casting long shadows across the valley
+        A cool breeze rustled the leaves
+        signaling the end of a hot summer day
+        Birds began their evening songs
+        while lights twinkled on in the distant town
+        It was a moment of peaceful calm
     """
 
-    query_embeddings = model.encode(query)
-    query = "SELECT messages.content FROM message_embeddings JOIN messages ON messages.message_id = message_embeddings.message_id_ref  ORDER BY embedding <-> ? LIMIT ?;"
-    params = (query_embeddings, top_k,)
+    message = "The sun set slowly over the mountains, casting long shadows across the valley. A cool breeze rustled the leaves, signaling the end of a hot summer day. Birds began their evening songs, while lights twinkled on in the distant town. It was a moment of peaceful calm"
+    message_list = list(map(lambda x :x.strip(), re.split(r'[,;|.]',message)))
 
-    return db.execute(query,params)
+    return message_list
 
