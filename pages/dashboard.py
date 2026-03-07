@@ -1,5 +1,5 @@
 import streamlit as st
-from helper import save_global_persona 
+from helper.session import save_global_persona 
 
 user = st.session_state['user']
 
@@ -23,5 +23,6 @@ if st.button("Save Persona"):
     st.rerun()
 
 if st.button("Logout"):
-    st.session_state['user'] = None
+    for key in st.session_state.keys():
+        del st.session_state[key]
     st.rerun()

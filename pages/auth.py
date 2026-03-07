@@ -1,5 +1,5 @@
 import streamlit as st
-from helper import register_user, authenticate_user
+from helper.auth import register_user, authenticate_user
 
 st.title("College Project Access")
 

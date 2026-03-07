@@ -21,7 +21,7 @@ class Database:
         with self.conn:
             self.conn.execute("""
                 CREATE TABLE IF NOT EXISTS users (
-                    user_id TEXT PRIMARY KEY,
+                    user_id INTEGER PRIMARY KEY AUTOINCREMENT,
                     email TEXT UNIQUE,
                     password_hash TEXT,
                     global_persona TEXT,
@@ -31,7 +31,8 @@ class Database:
             self.conn.execute("""
                 CREATE TABLE IF NOT EXISTS conversations (
                     conversation_id TEXT PRIMARY KEY,
-                    user_id TEXT,
+                    user_id INTEGER,
+                    title TEXT,
                     metadata JSON,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -50,9 +51,9 @@ class Database:
 
             self.conn.execute("""
                 CREATE VIRTUAL TABLE IF NOT EXISTS message_embeddings USING vec0(
-                    message_id_ref INTEGER PRIMARY KEY, 
-                    embedding FLOAT[768]
-                )""")
+                    message_id_ref TEXT PRIMARY KEY,
+                    embedding FLOAT[384]
+                );""")
 
     def execute(self, query, params=()):
         with self.conn:

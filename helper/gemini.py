@@ -2,6 +2,7 @@
 from google.genai import types
 from google.genai import errors
 from google import genai
+import os
 
 def get_gemini_response(prompt:str, system_instructions:str="")->dict:
     """
@@ -16,7 +17,7 @@ def get_gemini_response(prompt:str, system_instructions:str="")->dict:
         }
     """
     try:
-        client = genai.Client(api_key="AIzaSyALbdM3SQGli4HH38-kl9hepFy5hm2qlE0")
+        client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
         response = client.models.generate_content(
             model="gemini-2.5-flash",
             config=types.GenerateContentConfig(
@@ -59,7 +60,7 @@ def create_embeddings(chunks:str, dimentions:int=768)->dict:
     use 768 dimensions
     """
     try:
-        client = genai.Client(api_key="AIzaSyALbdM3SQGli4HH38-kl9hepFy5hm2qlE0")
+        client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
         result = client.models.embed_content(
         model="gemini-embedding-001",
         contents="What is the meaning of life?",

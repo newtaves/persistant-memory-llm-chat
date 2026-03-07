@@ -1,14 +1,17 @@
 #CRUD operations for chat sessions
 from db import db
-from embeddings import get_embeddings
+from .embeddings import get_embeddings
+import uuid
 
-def save_session(user_id:int, conversation_id:str, metadata:dict):
-    """
-    Save the chat session to the database
-    """
-    query = "INSERT INTO conversations(conversation_id, user_id, metadata) VALUES (?,?,?);"
-    params = (conversation_id, user_id, metadata)
-    return db.execute(query, params)
+def create_conversation(user_id, title, metadata="{}"):
+    conversation_id = str(uuid.uuid4())
+
+    db.execute("""
+        INSERT INTO conversations(conversation_id, user_id, title, metadata)
+        VALUES (?, ?, ?, ?)
+    """, (conversation_id, user_id, title, metadata))
+
+    return conversation_id
 
 def load_session(conversation_id:str):
     """
@@ -24,7 +27,7 @@ def delete_session(session_id):
     """
     return 1
 
-def list_sessions(user_id:int):
+def list_conversations(user_id:int):
     """
     List all the chat sessions from the database
     """
@@ -32,17 +35,32 @@ def list_sessions(user_id:int):
     params = (user_id,)
     return db.query(query, params)
 
-def save_message(session_id, message):
-    """
-    Save a message to the chat session in the database using the session_id and message
-    """
-    return 1
+def add_message(conversation_id, role, content):
+    message_id = str(uuid.uuid4())
 
-def load_messages(session_id):
-    """
-    Load all the messages from the chat session in the database using the session_id
-    """
-    return 1
+    db.execute("""
+        INSERT INTO messages(message_id, conversation_id, role, content)
+        VALUES (?, ?, ?, ?)
+    """, (message_id, conversation_id, role, content))
+
+    # update conversation timestamp
+    db.execute("""
+        UPDATE conversations
+        SET updated_at = CURRENT_TIMESTAMP
+        WHERE conversation_id = ?
+    """, (conversation_id,))
+
+    return message_id
+
+def get_messages(conversation_id):
+    rows = db.query("""
+        SELECT role, content
+        FROM messages
+        WHERE conversation_id = ?
+        ORDER BY created_at
+    """, (conversation_id,))
+
+    return [{"role": r["role"], "content": r["content"]} for r in rows]
 
 def load_global_persona(user_id:int):
     """
@@ -62,29 +80,37 @@ def save_global_persona(user_id, persona):
     return db.execute(query, params)
 
 def save_message_n_message_embeddings(conversation_id, role, content):
-    query = "INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?)"
-    params = (conversation_id, role, content,)
-    cursor = db.execute(query, params)
 
-    message_id = cursor.lastrowid
+    message_id = str(uuid.uuid4())
+
+    # save message
+    db.execute("""
+        INSERT INTO messages(message_id, conversation_id, role, content)
+        VALUES (?, ?, ?, ?)
+    """, (message_id, conversation_id, role, content))
+
+    # create embedding
     embedding = get_embeddings(content)
 
-    query = "INSERT INTO message_embeddings VALUES (?, ?)"
-    params = (message_id, embedding.tobytes(),)
-    cursor = db.execute(query, params)
+    db.execute("""
+        INSERT INTO message_embeddings(message_id_ref, embedding)
+        VALUES (?, ?)
+    """, (message_id, embedding.tobytes()))
 
-    return None
+    return message_id
 
-def retrive_context(message: str, top_k: int) -> list:
-    """
-    MATCH ? is how sqlite-vec triggers KNN search
-    AND K = ? replaces the LIMIT ?
-    ORDER BY distance BY uses cosine distance when using float vectors
-    """
+def retrieve_context(message: str, top_k: int = 5):
 
-    query_embeddings = get_embeddings(message)
-    query = f"""SELECT messages.content FROM message_embeddings JOIN messages ON messages.message_id = message_embeddings.message_id_ref WHERE message_embeddings.embedding MATCH ? AND k = {top_k} ORDER BY distance ASC;"""
-    params = (query_embeddings.tobytes(),)
-    rows = db.query(query, params)
+    query_embedding = get_embeddings(message)
+
+    rows = db.query("""
+        SELECT messages.content
+        FROM message_embeddings
+        JOIN messages
+        ON messages.message_id = message_embeddings.message_id_ref
+        WHERE message_embeddings.embedding MATCH ?
+        AND k = ?
+        ORDER BY distance
+    """, (query_embedding.tobytes(), top_k))
 
     return [r["content"] for r in rows]
