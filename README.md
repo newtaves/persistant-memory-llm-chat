@@ -10,7 +10,17 @@ management.
    ```bash
    pip install -r requirements.txt
    ```
-2. **Run the Streamlit app**
+2. **Setup Environment**
+   ```.env
+   GEMINI_API_KEY=your-gemini-apikey
+   
+   ```
+3. **Run the Streamlit app**
    ```bash
    streamlit run streamlit_app.py
    ```
+
+## Screenshots
+<img width="1364" height="643" alt="image" src="https://github.com/user-attachments/assets/bb1c1262-4e4a-4e9f-8807-89b709e7c0f9" />
+
+It can recall the previous conversations when needed.

@@ -15,17 +15,19 @@ def create_conversation(user_id, title, metadata="{}"):
 
 def load_session(conversation_id:str):
     """
-    Load the chat session from the database using the session_id
+    Load the chat session from the database using the conversation_id
     """
     query = "SELECT role, content FROM messages WHERE conversation_id = ? ORDER BY created_at ASC;"
     params = (conversation_id,)
     return db.query(query, params)
 
-def delete_session(session_id):
+def delete_session(conversation_id):
     """
-    Delete the chat session from the database using the session_id
+    Delete the chat session from the database using the conversation_id
     """
-    return 1
+    query = "DELETE FROM conversations WHERE conversation_id = ?"
+    params = (conversation_id,)
+    return db.execute(query,params)
 
 def list_conversations(user_id:int):
     """
