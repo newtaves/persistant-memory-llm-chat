@@ -1,4 +1,4 @@
- CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS users (
     user_id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT UNIQUE,
     password_hash TEXT,
@@ -22,9 +22,8 @@ CREATE TABLE IF NOT EXISTS messages (
     role TEXT,
     content TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (conversation_id) REFERENCES conversations(conversation_id)
+    FOREIGN KEY (conversation_id) REFERENCES conversations(conversation_id) ON DELETE CASCADE
 );
-
 CREATE VIRTUAL TABLE IF NOT EXISTS message_embeddings USING vec0(
     message_id_ref TEXT PRIMARY KEY,
     embedding FLOAT[384]

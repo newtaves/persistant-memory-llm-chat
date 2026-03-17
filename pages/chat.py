@@ -1,12 +1,12 @@
 import streamlit as st
 from dotenv import load_dotenv
-
 from helper import (
     create_conversation,
     list_conversations,
     load_session,
     save_message_n_message_embeddings,
-    retrieve_context
+    retrieve_context,
+    delete_session,
 )
 
 from helper import get_gemini_response, create_session_name
@@ -33,32 +33,42 @@ st.sidebar.title("Conversations")
 
 # New chat button
 if st.sidebar.button("➕ New Chat"):
-
     st.session_state.messages = []
     st.session_state.conversation_id = None
     st.session_state.first_response = True
-
     st.rerun()
 
 
 # Load user conversations
 conversations = list_conversations(st.session_state.user["user_id"])
-
-
 for conv in conversations:
+    if len(conv["title"])>30:
+        title = conv["title"][:30]+"..." or "Untitled"
+    else:
+        title = conv["title"] or "Untitled"
 
-    title = conv["title"] or "Untitled"
+    col1, col2 = st.sidebar.columns([4, 1])
 
-    if st.sidebar.button(title, key=conv["conversation_id"]):
-        st.session_state.conversation_id = conv["conversation_id"]
-        rows = load_session(conv["conversation_id"])
+    with col1:
+        if st.button(title, key=conv["conversation_id"]):
+            st.session_state.conversation_id = conv["conversation_id"]
+            rows = load_session(conv["conversation_id"])
 
-        st.session_state.messages = [
-            {"role": r["role"], "content": r["content"]} for r in rows
-        ]
+            st.session_state.messages = [
+                {"role": r["role"], "content": r["content"]} for r in rows
+            ]
 
-        st.session_state.first_response = False
-        st.rerun()
+            st.session_state.first_response = False
+            st.rerun()
+
+    with col2:
+        if st.button("🗑️", key=f"delete_{conv['conversation_id']}", type="primary"):
+            delete_session(conv["conversation_id"])
+            if st.session_state.conversation_id == conv["conversation_id"]:
+                st.session_state.messages = []
+                st.session_state.conversation_id = None
+                st.session_state.first_response = True
+            st.rerun()
 
 
 # ---------------- DISPLAY CHAT ---------------- #
@@ -72,11 +82,8 @@ for message in st.session_state.messages:
 # ---------------- USER INPUT ---------------- #
 
 if prompt := st.chat_input("Ask something..."):
-    open("log.txt", "w").write(prompt)
 
-    # show user message
     st.chat_message("user").markdown(prompt)
-
     st.session_state.messages.append({
         "role": "user",
         "content": prompt
@@ -86,7 +93,6 @@ if prompt := st.chat_input("Ask something..."):
     # ---------- RAG CONTEXT ---------- #
 
     context_list = retrieve_context(prompt, top_k=5)
-
     context_text = "\n".join(context_list)
 
     history = "\n".join(
@@ -133,33 +139,13 @@ if prompt := st.chat_input("Ask something..."):
 
         st.session_state.conversation_id = conversation_id
 
-        save_message_n_message_embeddings(
-            conversation_id,
-            "user",
-            prompt
-        )
-
-        save_message_n_message_embeddings(
-            conversation_id,
-            "assistant",
-            response
-        )
-
+        save_message_n_message_embeddings(conversation_id, "user", prompt)
+        save_message_n_message_embeddings(conversation_id, "assistant", response)
         st.session_state.first_response = False
 
     else:
-        print(prompt)
-        save_message_n_message_embeddings(
-            st.session_state.conversation_id,
-            "user",
-            prompt
-        )
-
-        save_message_n_message_embeddings(
-            st.session_state.conversation_id,
-            "assistant",
-            response
-        )
+        save_message_n_message_embeddings(st.session_state.conversation_id, "user", prompt)
+        save_message_n_message_embeddings(st.session_state.conversation_id, "assistant", response)
 
 
     # ---------- DISPLAY RESPONSE ---------- #

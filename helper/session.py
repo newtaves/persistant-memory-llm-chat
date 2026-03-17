@@ -25,9 +25,21 @@ def delete_session(conversation_id):
     """
     Delete the chat session from the database using the conversation_id
     """
-    query = "DELETE FROM conversations WHERE conversation_id = ?"
+    #Delete embeddings
+    query = """
+            DELETE FROM message_embeddings
+            WHERE message_id_ref IN (
+                SELECT message_id FROM messages
+                WHERE conversation_id = ?
+            )
+        """
     params = (conversation_id,)
-    return db.execute(query,params)
+    db.execute(query,params)
+
+    #delete conversation
+    query = "DELETE FROM conversations WHERE conversation_id = ?"
+    return db.execute(query, params)
+
 
 def list_conversations(user_id:int):
     """
