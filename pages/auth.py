@@ -2,6 +2,7 @@ import streamlit as st
 from helper.auth import register_user, authenticate_user
 
 st.title("College Project Access")
+st.text("For Demonstration purpose use the username 'new' with no password. ")
 
 tab1, tab2 = st.tabs(["Login", "Register"])
 

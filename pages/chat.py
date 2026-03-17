@@ -50,9 +50,7 @@ for conv in conversations:
     title = conv["title"] or "Untitled"
 
     if st.sidebar.button(title, key=conv["conversation_id"]):
-
         st.session_state.conversation_id = conv["conversation_id"]
-
         rows = load_session(conv["conversation_id"])
 
         st.session_state.messages = [
@@ -60,7 +58,6 @@ for conv in conversations:
         ]
 
         st.session_state.first_response = False
-
         st.rerun()
 
 
@@ -75,6 +72,7 @@ for message in st.session_state.messages:
 # ---------------- USER INPUT ---------------- #
 
 if prompt := st.chat_input("Ask something..."):
+    open("log.txt", "w").write(prompt)
 
     # show user message
     st.chat_message("user").markdown(prompt)
@@ -98,12 +96,12 @@ if prompt := st.chat_input("Ask something..."):
 
     system_instructions = f""" 
         You are a helpful assitant. Answer the questions of the user.
-        While answering use your long term memory when needed.
+        While answering use your long term memory whenever needed.
         Here is your long term memory:
         {context_text}
     """
 
-    prompt = f"""conversation History:
+    prompt_history = f"""conversation History:
         {history}
 
         User Question:
@@ -111,7 +109,7 @@ if prompt := st.chat_input("Ask something..."):
     """
     # ---------- LLM RESPONSE ---------- #
 
-    response = get_gemini_response(prompt, system_instructions)["response"]
+    response = get_gemini_response(prompt_history, system_instructions)["response"]
 
 
     # ---------- FIRST MESSAGE LOGIC ---------- #
@@ -150,7 +148,7 @@ if prompt := st.chat_input("Ask something..."):
         st.session_state.first_response = False
 
     else:
-
+        print(prompt)
         save_message_n_message_embeddings(
             st.session_state.conversation_id,
             "user",

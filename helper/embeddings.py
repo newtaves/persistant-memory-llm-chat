@@ -4,13 +4,18 @@
 from db import db
 from sentence_transformers import SentenceTransformer
 import re
-
+import os
 _model = None
 
 def get_model():
     global _model
     if _model is None:
-        _model = SentenceTransformer("paraphrase-MiniLM-L6-v2")
+        model_path = '.\\models'
+        # Fallback to download if local path doesn't exist
+        if os.path.exists(model_path):
+            _model = SentenceTransformer(model_path)
+        else:
+            _model = SentenceTransformer("paraphrase-MiniLM-L6-v2")
     return _model
 
 
