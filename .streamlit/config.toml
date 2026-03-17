@@ -1,0 +1,22 @@
+# .streamlit/config.toml - Anthropic "Sand" Style
+
+[theme]
+# Primary interactive color (buttons, sliders, links, etc.)
+# A subtle, professional blue or desaturated purple for accents
+# primaryColor = "#5A80B6" # A professional, slightly muted blue
+
+# Main background color of the app
+backgroundColor = "#F9F6F0" # A very light, warm sand/off-white
+
+# Background color for secondary elements (sidebar, cards, etc.)
+# Slightly darker beige/sand for subtle contrast
+secondaryBackgroundColor = "#EAE0D1"
+
+# Main text color
+textColor = "#2E2E2E" # Dark grey for excellent readability on a light background
+
+# Font family
+font = "sans serif" # Clean, modern sans-serif font
+
+# Explicitly sets the base theme to light (important for the "sand" look)
+base = "light"

@@ -2,6 +2,12 @@
 
 A Streamlit-based chat application featuring **Retrieval-Augmented Generation (RAG)** with persistent memory management. This project demonstrates how to build an AI-powered chat interface that maintains conversation history and uses vector embeddings for context retrieval.
 
+## Demonstration Urls
+   [Live demonstration](https://persistant-memory-llm-chat.streamlit.app/)
+   
+
+   [Github url](https://github.com/newtaves/persistant-memory-llm-chat)
+
 ## Features
 
 - **User Authentication**: Secure login system with password hashing
@@ -63,7 +69,7 @@ A Streamlit-based chat application featuring **Retrieval-Augmented Generation (R
 
 ## Usage
 
-1. **Login/Register**: Create an account or log in with existing credentials
+1. **Login/Register**: Create an account or log in with existing credentials. Use 'test' for demonstration purpose. No password required
 2. **Dashboard**: View your account information
 3. **Chat**: Start new conversations or continue previous ones
 4. **Context Retrieval**: The app automatically retrieves relevant past messages for context-aware responses
