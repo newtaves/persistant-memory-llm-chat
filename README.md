@@ -10,7 +10,7 @@ A Streamlit-based chat application featuring **Retrieval-Augmented Generation (R
 ## Features
 
 - **User Authentication**: Secure login system with password hashing
-- **Persistent Conversations**: All chat history stored in SQLite database
+- **Persistent Conversations**: All chat history stored in postgres database
 - **RAG Implementation**: Context-aware responses using vector similarity search
 - **Multi-page Interface**: Clean Streamlit UI with dashboard and chat pages
 - **Google Gemini Integration**: Powered by Google's Gemini AI model
@@ -119,7 +119,7 @@ persistant-memory-llm-chat/
 
 ## Database Schema
 
-The application uses SQLite with vector extensions for efficient storage and retrieval of chat data. The schema includes the following tables:
+The application uses Postgres database with vector extensions for efficient storage and retrieval of chat data. The schema includes the following tables:
 
 ### Tables
 
@@ -149,7 +149,7 @@ Stores individual chat messages within conversations.
 - `created_at` (TIMESTAMP): Message creation timestamp
 
 #### `message_embeddings`
-Vector embeddings table for RAG functionality using sqlite-vec.
+Vector embeddings table for RAG functionality using pgvector.
 - `message_id_ref` (INTEGER, PRIMARY KEY): Reference to message_id in messages table
 - `embedding` (FLOAT[384]): 384-dimensional vector embedding for semantic search
 
@@ -172,7 +172,7 @@ The application implements **Retrieval-Augmented Generation (RAG)** to provide c
 - **Purpose**: Converts text messages into numerical vectors for semantic similarity search
 
 ### Vector Storage
-- **Database**: SQLite with `sqlite-vec` extension for efficient vector operations
+- **Database**: postgres with `pgvector` extension for efficient vector operations
 - **Table**: `message_embeddings` stores embeddings as byte arrays
 - **Indexing**: Uses vector indexing for fast similarity searches
 
