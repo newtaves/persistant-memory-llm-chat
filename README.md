@@ -4,6 +4,7 @@ A Streamlit-based chat application featuring **Retrieval-Augmented Generation (R
 
 ## Demonstration Urls
    [Live demonstration](https://persistant-memory-llm-chat.streamlit.app/)
+   The website may go to sleep mode due to inactivity. So opening may take some time.
 
    [Github url](https://github.com/newtaves/persistant-memory-llm-chat)
 
