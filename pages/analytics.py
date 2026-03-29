@@ -1,15 +1,15 @@
 import streamlit as st
 import pandas as pd
-from helper.stats import keyword_popularity, top_users, top_time, vocabulary, active_time, convo_by_users
+from helper.stats import keyword_popularity, top_users, top_time, vocabulary, active_time, convo_by_users, most_active_users
 
 user = st.session_state['user']
 
 st.sidebar.markdown("Analytics")
 
 st.title("Analytics")
-st.write("See the Insights for")
+st.write("See the Reports for")
 
-options = ["word","user"]
+options = ["word","user", "User Activity"]
 
 element = st.selectbox("Select option", options, label_visibility="collapsed")
 if element == options[0]:
@@ -39,7 +39,8 @@ if element == options[0]:
         df['occurrences'] = pd.to_numeric(df['occurrences'])
         df = df.sort_values(by='occurrences', ascending=False)
         df.set_index('user_id', inplace=True)
-        st.bar_chart(df,x_label="User Id",y_label="Occurrence")
+        # st.bar_chart(df,x_label="User Id",y_label="Occurrence")
+        st.dataframe(df)
 
 
 if element == options[1]:
@@ -60,7 +61,7 @@ if element == options[1]:
         df = df.head(top_n)
         df = df.set_index("word")
         if limit == 0:
-            st.bar_chart(df, x_label="words", y_label="frequency")
+            st.bar_chart(df, x_label="words", y_label="frequency", sort=False)
         else:
             st.bar_chart(df, x_label="words", y_label="frequency")
         
@@ -75,3 +76,23 @@ if element == options[1]:
         df.set_index("hour", inplace=True)
         st.bar_chart(df,x_label="hours")
 
+if element == options[2]:
+    col1, col2, col3 = st.columns([1, 1, 1])
+
+    with col1:
+        from_date = st.date_input("From")
+
+    with col2:
+        to_date = st.date_input("To")
+
+    with col3:
+        load = st.button("Load Data")
+
+    if load and from_date and to_date:
+        st.markdown("## Most active users")
+        df = pd.DataFrame(most_active_users(from_date, to_date, 5, activity="most"))
+        st.dataframe(df)
+        
+        st.markdown("## Least Active users")
+        df=pd.DataFrame(most_active_users(from_date, to_date, k=5, activity="least"))
+        st.dataframe(df)

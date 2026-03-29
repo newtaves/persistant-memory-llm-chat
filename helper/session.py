@@ -112,7 +112,7 @@ def save_message_n_message_embeddings(conversation_id, role, content):
 
     return message_id
 
-def retrieve_context(message: str, top_k: int = 5):
+def retrieve_context(message: str, user_id: int, top_k: int = 5):
     # Ensure query_embedding is a list or vector object, 
     # as pgvector-python handles the conversion to Postgres format.
     query_embedding = get_embeddings(message)
@@ -120,12 +120,13 @@ def retrieve_context(message: str, top_k: int = 5):
     # Use the <=> operator for cosine distance (smaller is closer)
     # Use <-> for Euclidean distance
     rows = db.query("""
-        SELECT messages.content
-        FROM message_embeddings
-        JOIN messages
-        ON messages.message_id = message_embeddings.message_id_ref
-        ORDER BY message_embeddings.embedding <=> %s
+        SELECT m.content
+        FROM message_embeddings me
+        JOIN messages m ON m.message_id = me.message_id_ref
+        JOIN conversations c ON c.conversation_id = m.conversation_id
+        Where c.user_id = %s
+        ORDER BY me.embedding <=> %s
         LIMIT %s
-    """, (query_embedding, top_k))
+    """, (user_id, query_embedding, top_k))
 
     return [r["content"] for r in rows]

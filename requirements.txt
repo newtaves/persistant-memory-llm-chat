@@ -1,6 +1,5 @@
 streamlit
 python-dotenv
-sqlite-vec
 google-genai
 passlib
 argon2
@@ -8,3 +7,4 @@ argon2_cffi
 sentence_transformers
 psycopg2-binary
 pgvector
+pandas

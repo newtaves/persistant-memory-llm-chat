@@ -10,7 +10,7 @@ if 'user' not in st.session_state:
 login_page = st.Page("pages/auth.py", title="Log In", icon=":material/login:")
 dashboard_page = st.Page("pages/dashboard.py", title="Dashboard", icon=":material/dashboard:")
 chat_page = st.Page("pages/chat.py", title="Chat", icon=":material/smart_toy:")
-analytic_page = st.Page("pages/analytics.py", title="Analytics", icon=":material/thumb_up:")
+analytic_page = st.Page("pages/analytics.py", title="Analytics", icon=":material/bar_chart:")
 
 
 if st.session_state['user'] is None:

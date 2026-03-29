@@ -96,7 +96,7 @@ if prompt := st.chat_input("Ask something..."):
 
     # ---------- RAG CONTEXT ---------- #
 
-    context_list = retrieve_context(prompt, top_k=5)
+    context_list = retrieve_context(prompt,st.session_state.user["user_id"], top_k=5)
     context_text = "\n".join(context_list)
     history = "\n".join(
         f"{m['role']}: {m['content']}"

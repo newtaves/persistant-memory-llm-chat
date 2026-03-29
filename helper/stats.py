@@ -12,7 +12,7 @@ def keyword_popularity(word:str):
     Get the poplularity/frequency of the word in the entire database
     """
 
-    query = ("""
+    query = (r"""
         SELECT SUM(CASE WHEN LOWER(word) = %s THEN 1 ELSE 0 END) * 1.0 / COUNT(*) AS poplularity
         FROM messages m,
         LATERAL regexp_split_to_table(m.content, '\s+') AS word;
@@ -118,16 +118,38 @@ def convo_by_users(keyword:str):
     query = """
     SELECT 
     c.user_id,
+    u.email,
     COUNT(*) AS occurrences
     FROM messages m
     JOIN conversations c 
         ON m.conversation_id = c.conversation_id
+    JOIN users u 
+        ON u.user_id = c.user_id
     CROSS JOIN LATERAL regexp_split_to_table(m.content, '[^a-zA-Z]+') AS word
     WHERE LOWER(word) = %s
-    GROUP BY c.user_id
+    GROUP BY c.user_id, u.email
     ORDER BY occurrences DESC;    
     """
 
     params = [keyword,]
 
     return db.query(query,params)
+
+
+def most_active_users(start_date:str, end_date:str,  k:int=5, activity:str="most"):
+    """
+    Return top k most/least active users between start_date and end_date
+    """
+    order = "DESC" if activity.lower()=="most" else "ASC"
+    query = f"""
+        SELECT u.user_id, u.email, COUNT(m.message_id) AS message_count
+        FROM users u
+        LEFT JOIN conversations c ON u.user_id = c.user_id
+        LEFT JOIN messages m ON c.conversation_id = m.conversation_id
+        AND m.created_at BETWEEN %s AND %s
+        GROUP BY u.user_id, u.email
+        ORDER BY message_count {order}
+        LIMIT %s;
+    """
+    params = (start_date, end_date, k,)
+    return db.query(query, params)
