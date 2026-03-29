@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from helper.stats import keyword_popularity, top_users, top_time, vocabulary, active_time, convo_by_users, most_active_users
+from helper.stats import keyword_popularity, top_users, top_time, vocabulary, active_time, convo_by_users, most_active_users, run_custom_query
 
 user = st.session_state['user']
 
@@ -9,7 +9,7 @@ st.sidebar.markdown("Analytics")
 st.title("Analytics")
 st.write("See the Reports for")
 
-options = ["word","user", "User Activity"]
+options = ["word","user", "User Activity", "Custom Query"]
 
 element = st.selectbox("Select option", options, label_visibility="collapsed")
 if element == options[0]:
@@ -77,22 +77,35 @@ if element == options[1]:
         st.bar_chart(df,x_label="hours")
 
 if element == options[2]:
-    col1, col2, col3 = st.columns([1, 1, 1])
+    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
 
     with col1:
         from_date = st.date_input("From")
 
     with col2:
         to_date = st.date_input("To")
-
+    
     with col3:
+        top_k = st.input("Number of outputs:")
+
+    with col4:
         load = st.button("Load Data")
 
     if load and from_date and to_date:
         st.markdown("## Most active users")
-        df = pd.DataFrame(most_active_users(from_date, to_date, 5, activity="most"))
+        df = pd.DataFrame(most_active_users(from_date, to_date, int(top_k), activity="most"))
         st.dataframe(df)
         
         st.markdown("## Least Active users")
-        df=pd.DataFrame(most_active_users(from_date, to_date, k=5, activity="least"))
+        df=pd.DataFrame(most_active_users(from_date, to_date, int(top_k), activity="least"))
+        st.dataframe(df)
+
+if element == options[3]:
+    st.markdown("## Run your custom query on the database")
+    query = st.text_area("Enter your custom Query:")
+    run = st.button("Run Query")
+
+    if run and query:
+        df = pd.DataFrame(run_custom_query(query))
+        st.markdown("## Output:")
         st.dataframe(df)

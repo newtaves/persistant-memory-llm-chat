@@ -153,3 +153,6 @@ def most_active_users(start_date:str, end_date:str,  k:int=5, activity:str="most
     """
     params = (start_date, end_date, k,)
     return db.query(query, params)
+
+def run_custom_query(query:str):
+    return db.query(query)
