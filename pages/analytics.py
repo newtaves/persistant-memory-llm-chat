@@ -86,7 +86,7 @@ if element == options[2]:
         to_date = st.date_input("To")
     
     with col3:
-        top_k = st.input("Number of outputs:")
+        top_k = st.text_input("Number of outputs:")
 
     with col4:
         load = st.button("Load Data")
